@@ -18,8 +18,15 @@ def journal():
 def statistics():
     return render_template("statistics.html")
 
-@app.route("/pre-trade-checklist")
+@app.route("/pre-trade-checklist", methods=["GET", "POST"])
 def pre_trade_checklist():
+    if request.method == "POST":
+        # Burada formdan gelen verileri işleyebilirsin
+        # Örneğin:
+        # data = request.form
+        # print(data)
+        # Sonra bir teşekkür sayfasına veya journal'a yönlendirebilirsin:
+        return redirect(url_for("journal"))
     return render_template("pre_trade_checklist.html")
 
 @app.route("/risk-calculator")
