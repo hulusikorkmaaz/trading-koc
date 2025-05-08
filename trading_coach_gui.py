@@ -3,6 +3,22 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return "index.html"
+    
+    @app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route("/post-trade-analysis")
+def post_trade_analysis():
+    return render_template("post_trade_analysis.html")
+
+@app.route("/journal")
+def journal():
+    return render_template("journal.html")
+
+@app.route("/statistics")
+def statistics():
+    return render_template("statistics.html")
 import tkinter as tk
 from tkinter import ttk, messagebox
 import json
