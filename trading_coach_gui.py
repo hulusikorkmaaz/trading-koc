@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
@@ -68,6 +69,9 @@ def delete_trade(trade_id):
     return redirect(url_for("journal"))
 
 if __name__ == "__main__":
+    # trades.db dosyasını sil (varsa)
+    if os.path.exists("trades.db"):
+        os.remove("trades.db")
     with app.app_context():
         db.create_all()
     app.run(debug=True)
