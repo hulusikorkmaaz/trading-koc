@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Yönetimi Hesaplayıcı - Hiko'nun Trade Planı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a1a1a;    /* Koyu gri */
+            --secondary-color: #2d2d2d;  /* Orta gri */
+            --accent-color: #00ff9d;    /* Neon yeşil */
+            --success-color: #00ff9d;   /* Neon yeşil */
+            --warning-color: #ffd700;   /* Altın sarısı */
+            --danger-color: #ff4444;    /* Kırmızı */
+            --text-color: #ffffff;      /* Beyaz */
+            --card-bg: #2d2d2d;        /* Orta gri */
+            --hover-color: #363636;    /* Açık gri */
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--secondary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--text-color) !important;
+        }
+
+        .calculator-section {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            color: var(--text-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            background-color: var(--hover-color);
+            border: 1px solid var(--secondary-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 0.8rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--hover-color);
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            box-shadow: 0 0 0 0.25rem rgba(0, 255, 157, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #00cc7d;
+            transform: translateY(-2px);
+            color: var(--primary-color);
+        }
+
+        .results {
+            background-color: var(--hover-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+
+        .result-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--secondary-color);
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 0.3rem;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .section-icon {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .form-text {
+            color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line me-2"></i>
+                Hiko'nun Trade Planı
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="calculator-section">
+            <h3 class="section-title">
+                <i class="fas fa-calculator section-icon"></i>
+                Pozisyon Büyüklüğü Hesaplayıcı
+            </h3>
+            <form id="position-size-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="account_balance" class="form-label">Hesap Bakiyesi ($)</label>
+                        <input type="number" class="form-control" id="account_balance" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="risk_percentage" class="form-label">Risk Yüzdesi (%)</label>
+                        <input type="number" class="form-control" id="risk_percentage" step="0.1" required>
+                        <div class="form-text">Önerilen: %1-2</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="stop_loss_pips" class="form-label">Stop Loss (Pips)</label>
+                        <input type="number" class="form-control" id="stop_loss_pips" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="trading_pair" class="form-label">Trading Pair</label>
+                        <select class="form-select" id="trading_pair" required>
+                            <option value="">Seçiniz</option>
+                            <option value="EUR/USD">EUR/USD</option>
+                            <option value="GBP/USD">GBP/USD</option>
+                            <option value="XAU/USD">XAU/USD</option>
+                            <option value="NZD/JPY">NZD/JPY</option>
+                            <option value="AUD/USD">AUD/USD</option>
+                            <option value="AUD/JPY">AUD/JPY</option>
+                            <option value="GBP/JPY">GBP/JPY</option>
+                            <option value="EUR/JPY">EUR/JPY</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calculator me-2"></i>
+                        Hesapla
+                    </button>
+                </div>
+            </form>
+            <div class="results" id="position-size-results" style="display: none;">
+                <div class="result-item">
+                    <div class="result-label">Risk Edilen Miktar</div>
+                    <div class="result-value" id="risk_amount">$0.00</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Pozisyon Büyüklüğü</div>
+                    <div class="result-value" id="position_size">0.00 lot</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Pip Değeri</div>
+                    <div class="result-value" id="pip_value">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="calculator-section">
+            <h3 class="section-title">
+                <i class="fas fa-balance-scale section-icon"></i>
+                Risk/Ödül Hesaplayıcı
+            </h3>
+            <form id="risk-reward-form">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="entry_price" class="form-label">Giriş Fiyatı</label>
+                        <input type="number" class="form-control" id="entry_price" step="0.00001" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="stop_loss_price" class="form-label">Stop Loss Fiyatı</label>
+                        <input type="number" class="form-control" id="stop_loss_price" step="0.00001" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="take_profit_price" class="form-label">Take Profit Fiyatı</label>
+                        <input type="number" class="form-control" id="take_profit_price" step="0.00001" required>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calculator me-2"></i>
+                        Hesapla
+                    </button>
+                </div>
+            </form>
+            <div class="results" id="risk-reward-results" style="display: none;">
+                <div class="result-item">
+                    <div class="result-label">Risk (Pips)</div>
+                    <div class="result-value" id="risk_pips">0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Ödül (Pips)</div>
+                    <div class="result-value" id="reward_pips">0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Risk/Ödül Oranı</div>
+                    <div class="result-value" id="risk_reward_ratio">0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="calculator-section">
+            <h3 class="section-title">
+                <i class="fas fa-chart-line section-icon"></i>
+                Günlük/Haftalık Risk Limiti Hesaplayıcı
+            </h3>
+            <form id="risk-limit-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="account_balance_limit" class="form-label">Hesap Bakiyesi ($)</label>
+                        <input type="number" class="form-control" id="account_balance_limit" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="max_daily_risk" class="form-label">Maksimum Günlük Risk (%)</label>
+                        <input type="number" class="form-control" id="max_daily_risk" step="0.1" required>
+                        <div class="form-text">Önerilen: %5-10</div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calculator me-2"></i>
+                        Hesapla
+                    </button>
+                </div>
+            </form>
+            <div class="results" id="risk-limit-results" style="display: none;">
+                <div class="result-item">
+                    <div class="result-label">Günlük Risk Limiti</div>
+                    <div class="result-value" id="daily_risk_limit">$0.00</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Haftalık Risk Limiti</div>
+                    <div class="result-value" id="weekly_risk_limit">$0.00</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Maksimum Günlük İşlem Sayısı</div>
+                    <div class="result-value" id="max_daily_trades">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pozisyon Büyüklüğü Hesaplayıcı
+            const positionSizeForm = document.getElementById('position-size-form');
+            const positionSizeResults = document.getElementById('position-size-results');
+
+            positionSizeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const accountBalance = parseFloat(document.getElementById('account_balance').value);
+                const riskPercentage = parseFloat(document.getElementById('risk_percentage').value);
+                const stopLossPips = parseFloat(document.getElementById('stop_loss_pips').value);
+                const tradingPair = document.getElementById('trading_pair').value;
+
+                const riskAmount = accountBalance * (riskPercentage / 100);
+                let pipValue;
+                let positionSize;
+
+                // Pip değeri hesaplama (basitleştirilmiş)
+                if (tradingPair.includes('JPY')) {
+                    pipValue = 0.01;
+                } else {
+                    pipValue = 0.0001;
+                }
+
+                positionSize = riskAmount / (stopLossPips * pipValue * 100000);
+
+                document.getElementById('risk_amount').textContent = `$${riskAmount.toFixed(2)}`;
+                document.getElementById('position_size').textContent = `${positionSize.toFixed(2)} lot`;
+                document.getElementById('pip_value').textContent = `$${(pipValue * 100000).toFixed(2)}`;
+
+                positionSizeResults.style.display = 'block';
+            });
+
+            // Risk/Ödül Hesaplayıcı
+            const riskRewardForm = document.getElementById('risk-reward-form');
+            const riskRewardResults = document.getElementById('risk-reward-results');
+
+            riskRewardForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const entryPrice = parseFloat(document.getElementById('entry_price').value);
+                const stopLossPrice = parseFloat(document.getElementById('stop_loss_price').value);
+                const takeProfitPrice = parseFloat(document.getElementById('take_profit_price').value);
+
+                const riskPips = Math.abs(entryPrice - stopLossPrice) * 10000;
+                const rewardPips = Math.abs(takeProfitPrice - entryPrice) * 10000;
+                const riskRewardRatio = rewardPips / riskPips;
+
+                document.getElementById('risk_pips').textContent = riskPips.toFixed(1);
+                document.getElementById('reward_pips').textContent = rewardPips.toFixed(1);
+                document.getElementById('risk_reward_ratio').textContent = riskRewardRatio.toFixed(2);
+
+                riskRewardResults.style.display = 'block';
+            });
+
+            // Risk Limiti Hesaplayıcı
+            const riskLimitForm = document.getElementById('risk-limit-form');
+            const riskLimitResults = document.getElementById('risk-limit-results');
+
+            riskLimitForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const accountBalance = parseFloat(document.getElementById('account_balance_limit').value);
+                const maxDailyRisk = parseFloat(document.getElementById('max_daily_risk').value);
+
+                const dailyRiskLimit = accountBalance * (maxDailyRisk / 100);
+                const weeklyRiskLimit = dailyRiskLimit * 5; // 5 işlem günü
+                const maxDailyTrades = Math.floor(maxDailyRisk / 2); // Her işlemde max %2 risk
+
+                document.getElementById('daily_risk_limit').textContent = `$${dailyRiskLimit.toFixed(2)}`;
+                document.getElementById('weekly_risk_limit').textContent = `$${weeklyRiskLimit.toFixed(2)}`;
+                document.getElementById('max_daily_trades').textContent = maxDailyTrades;
+
+                riskLimitResults.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html> 

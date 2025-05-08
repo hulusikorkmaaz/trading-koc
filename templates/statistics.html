@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İstatistikler ve Analiz - Hiko'nun Trade Planı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a1a1a;    /* Koyu gri */
+            --secondary-color: #2d2d2d;  /* Orta gri */
+            --accent-color: #ffffff;    /* Beyaz */
+            --success-color: #ffffff;   /* Beyaz */
+            --warning-color: #ffd700;   /* Altın sarısı */
+            --danger-color: #ff4444;    /* Kırmızı */
+            --text-color: #ffffff;      /* Beyaz */
+            --card-bg: #2d2d2d;        /* Orta gri */
+            --hover-color: #363636;    /* Açık gri */
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--secondary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--text-color) !important;
+        }
+
+        .stats-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            background-color: var(--hover-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .chart-container {
+            background-color: var(--hover-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-icon {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line me-2"></i>
+                Hiko'nun Trade Planı
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        {% if trades %}
+            <div class="stats-card">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-pie section-icon"></i>
+                    Genel İstatistikler
+                </h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ stats.total_trades }}</div>
+                        <div class="stat-label">Toplam İşlem</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ "%.1f"|format(stats.win_rate) }}%</div>
+                        <div class="stat-label">Kazanma Oranı</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${{ "%.2f"|format(stats.total_profit) }}</div>
+                        <div class="stat-label">Toplam Kar/Zarar</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ "%.2f"|format(stats.avg_risk_reward) }}</div>
+                        <div class="stat-label">Ort. Risk/Ödül</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-bar section-icon"></i>
+                    Kazanç/Kayıp Dağılımı
+                </h3>
+                <div class="chart-container">
+                    {{ win_loss_chart|safe }}
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line section-icon"></i>
+                    Pair Performansı
+                </h3>
+                <div class="chart-container">
+                    {{ pair_performance_chart|safe }}
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <h3 class="section-title">
+                    <i class="fas fa-brain section-icon"></i>
+                    Duygusal Analiz
+                </h3>
+                <div class="chart-container">
+                    {{ emotional_analysis_chart|safe }}
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <h3 class="section-title">
+                    <i class="fas fa-balance-scale section-icon"></i>
+                    Risk/Ödül Analizi
+                </h3>
+                <div class="chart-container">
+                    {{ risk_reward_chart|safe }}
+                </div>
+            </div>
+        {% else %}
+            <div class="no-data">
+                <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                <h4>Henüz istatistik oluşturulamıyor</h4>
+                <p>İşlem kayıtları eklendiğinde istatistikler otomatik olarak oluşturulacaktır.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

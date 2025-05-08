@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İşlem Öncesi Kontrol Listesi - Hiko'nun Trade Planı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a1a1a;    /* Koyu gri */
+            --secondary-color: #2d2d2d;  /* Orta gri */
+            --accent-color: #ffffff;    /* Beyaz */
+            --success-color: #ffffff;   /* Beyaz */
+            --warning-color: #ffd700;   /* Altın sarısı */
+            --danger-color: #ff4444;    /* Kırmızı */
+            --text-color: #ffffff;      /* Beyaz */
+            --card-bg: #2d2d2d;        /* Orta gri */
+            --hover-color: #363636;    /* Açık gri */
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--secondary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--text-color) !important;
+        }
+
+        .checklist-section {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-check {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: var(--hover-color);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-check:hover {
+            transform: translateX(5px);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .form-check-label {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #00cc7d;
+            transform: translateY(-2px);
+            color: var(--primary-color);
+        }
+
+        .progress {
+            height: 10px;
+            background-color: var(--hover-color);
+            border-radius: 5px;
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            background-color: var(--accent-color);
+        }
+
+        .completion-status {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .section-icon {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line me-2"></i>
+                Hiko'nun Trade Planı
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="completion-status text-center">
+            <h4>Kontrol Listesi Tamamlanma Durumu</h4>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+            </div>
+            <p id="completion-text">0% Tamamlandı</p>
+        </div>
+
+        <form id="checklist-form" method="POST">
+            <div class="checklist-section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line section-icon"></i>
+                    Piyasa Analizi
+                </h3>
+                <div class="checklist-item">
+                    <input type="checkbox" id="market_conditions" name="market_conditions" class="checklist-checkbox">
+                    <label for="market_conditions">Piyasa koşullarını analiz ettim</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="market_trend" name="market_trend" class="checklist-checkbox">
+                    <label for="market_trend">Piyasa trendini belirledim</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="support_resistance" name="support_resistance" class="checklist-checkbox">
+                    <label for="support_resistance">Destek ve direnç seviyelerini belirledim</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="price_zone" name="price_zone" class="checklist-checkbox">
+                    <label for="price_zone">Fiyat Premium veya Discount bölgesinde dikkat edildi mi</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="mitigation" name="mitigation" class="checklist-checkbox">
+                    <label for="mitigation">Fiyat mitigasyon temas sonrası güçsüzlük gösterdi</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="fvg" name="fvg" class="checklist-checkbox">
+                    <label for="fvg">FVG High/Low çıkartmadı</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="opposing_force" name="opposing_force" class="checklist-checkbox">
+                    <label for="opposing_force">Karşıt gücü test etti mi</label>
+                </div>
+            </div>
+
+            <div class="checklist-section">
+                <h3 class="section-title">
+                    <i class="fas fa-brain section-icon"></i>
+                    Psikolojik Hazırlık
+                </h3>
+                <div class="checklist-item">
+                    <input type="checkbox" id="emotional_state" name="emotional_state" class="checklist-checkbox">
+                    <label for="emotional_state">Duygusal durumumu kontrol ettim</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="risk_tolerance" name="risk_tolerance" class="checklist-checkbox">
+                    <label for="risk_tolerance">Risk toleransımı değerlendirdim</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="trading_plan" name="trading_plan" class="checklist-checkbox">
+                    <label for="trading_plan">Trading planıma uygun hareket ediyorum</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="news_check" name="news_check" class="checklist-checkbox">
+                    <label for="news_check">Önemli haberler kontrol edildi mi</label>
+                </div>
+            </div>
+
+            <div class="text-center mb-5">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>
+                    Kontrol Listesini Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('checklist-form');
+            const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+            const progressBar = document.querySelector('.progress-bar');
+            const completionText = document.getElementById('completion-text');
+
+            function updateProgress() {
+                const checked = form.querySelectorAll('input[type="checkbox"]:checked').length;
+                const total = checkboxes.length;
+                const percentage = (checked / total) * 100;
+                
+                progressBar.style.width = percentage + '%';
+                completionText.textContent = Math.round(percentage) + '% Tamamlandı';
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateProgress);
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const data = {};
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+
+                fetch('/pre-trade-checklist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Kontrol listesi başarıyla kaydedildi!');
+                        window.location.href = '/post-trade-analysis';
+                    } else {
+                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

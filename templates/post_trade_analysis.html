@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İşlem Sonrası Değerlendirme - Hiko'nun Trade Planı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a1a1a;    /* Koyu gri */
+            --secondary-color: #2d2d2d;  /* Orta gri */
+            --accent-color: #ffffff;    /* Beyaz */
+            --success-color: #ffffff;   /* Beyaz */
+            --warning-color: #ffd700;   /* Altın sarısı */
+            --danger-color: #ff4444;    /* Kırmızı */
+            --text-color: #ffffff;      /* Beyaz */
+            --card-bg: #2d2d2d;        /* Orta gri */
+            --hover-color: #363636;    /* Açık gri */
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--secondary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--text-color) !important;
+        }
+
+        .analysis-section {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            color: var(--text-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            background-color: var(--hover-color);
+            border: 1px solid var(--secondary-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 0.8rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--hover-color);
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            box-shadow: 0 0 0 0.25rem rgba(0, 255, 157, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #00cc7d;
+            transform: translateY(-2px);
+            color: var(--primary-color);
+        }
+
+        .section-icon {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .form-text {
+            color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line me-2"></i>
+                Hiko'nun Trade Planı
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <form id="analysis-form" method="POST">
+            <div class="analysis-section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line section-icon"></i>
+                    İşlem Detayları
+                </h3>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="pair" class="form-label">Trading Pair</label>
+                        <select class="form-select" id="pair" name="pair" required>
+                            <option value="">Seçiniz</option>
+                            <option value="EUR/USD">EUR/USD</option>
+                            <option value="GBP/USD">GBP/USD</option>
+                            <option value="XAU/USD">XAU/USD</option>
+                            <option value="NZD/JPY">NZD/JPY</option>
+                            <option value="AUD/USD">AUD/USD</option>
+                            <option value="AUD/JPY">AUD/JPY</option>
+                            <option value="GBP/JPY">GBP/JPY</option>
+                            <option value="EUR/JPY">EUR/JPY</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="direction" class="form-label">Yön</label>
+                        <select class="form-select" id="direction" name="direction" required>
+                            <option value="">Seçiniz</option>
+                            <option value="long">Long</option>
+                            <option value="short">Short</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="entry_price" class="form-label">Giriş Fiyatı</label>
+                        <input type="number" step="0.00001" class="form-control" id="entry_price" name="entry_price" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="stop_loss" class="form-label">Stop Loss</label>
+                        <input type="number" step="0.00001" class="form-control" id="stop_loss" name="stop_loss" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="take_profit" class="form-label">Take Profit</label>
+                        <input type="number" step="0.00001" class="form-control" id="take_profit" name="take_profit" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-bar section-icon"></i>
+                    Sonuç ve Analiz
+                </h3>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="result" class="form-label">Sonuç</label>
+                        <select class="form-select" id="result" name="result" required>
+                            <option value="">Seçiniz</option>
+                            <option value="win">Kazanç</option>
+                            <option value="loss">Kayıp</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="exit_price" class="form-label">Çıkış Fiyatı</label>
+                        <input type="number" step="0.00001" class="form-control" id="exit_price" name="exit_price" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="risk_amount" class="form-label">Risk Miktarı ($)</label>
+                        <input type="number" step="0.01" class="form-control" id="risk_amount" name="risk_amount" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="reward_amount" class="form-label">Kazanç Miktarı ($)</label>
+                        <input type="number" step="0.01" class="form-control" id="reward_amount" name="reward_amount" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="risk_reward_ratio" class="form-label">Risk/Ödül Oranı</label>
+                        <input type="number" step="0.01" class="form-control" id="risk_reward_ratio" name="risk_reward_ratio" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-section">
+                <h3 class="section-title">
+                    <i class="fas fa-brain section-icon"></i>
+                    Duygusal Analiz
+                </h3>
+                <div class="mb-3">
+                    <label for="emotions" class="form-label">İşlem Sırasındaki Duygular</label>
+                    <textarea class="form-control" id="emotions" name="emotions" rows="3" required></textarea>
+                    <div class="form-text">İşlem sırasında hissettiğiniz duyguları detaylı bir şekilde açıklayın.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="emotional_impact" class="form-label">Duygusal Etki</label>
+                    <select class="form-select" id="emotional_impact" name="emotional_impact" required>
+                        <option value="">Seçiniz</option>
+                        <option value="positive">Pozitif</option>
+                        <option value="neutral">Nötr</option>
+                        <option value="negative">Negatif</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="analysis-section">
+                <h3 class="section-title">
+                    <i class="fas fa-lightbulb section-icon"></i>
+                    Öğrenilen Dersler
+                </h3>
+                <div class="mb-3">
+                    <label for="lessons" class="form-label">Öğrenilen Dersler</label>
+                    <textarea class="form-control" id="lessons" name="lessons" rows="3" required></textarea>
+                    <div class="form-text">Bu işlemden çıkardığınız dersleri yazın.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="improvements" class="form-label">Geliştirme Alanları</label>
+                    <textarea class="form-control" id="improvements" name="improvements" rows="3" required></textarea>
+                    <div class="form-text">Bir sonraki işlemde geliştirmek istediğiniz alanları belirtin.</div>
+                </div>
+            </div>
+
+            <div class="text-center mb-5">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>
+                    Değerlendirmeyi Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('analysis-form');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const data = {};
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+
+                fetch('/post-trade-analysis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Değerlendirme başarıyla kaydedildi!');
+                        window.location.href = '/journal';
+                    } else {
+                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
