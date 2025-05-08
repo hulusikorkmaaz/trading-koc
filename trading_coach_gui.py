@@ -1,3 +1,5 @@
+from flask import Flask
+app = Flask(__name__)
 import tkinter as tk
 from tkinter import ttk, messagebox
 import json
