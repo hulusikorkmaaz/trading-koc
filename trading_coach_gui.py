@@ -495,13 +495,13 @@ Hesaplanan Risk Miktarı: ${risk_amount:.2f}
     root = tk.Tk()
     app = TradingCoachGUI(root)
     root.mainloop()
-    @app.route("/delete-trade/<int:trade_id>", methods=["POST"])
 
-    def delete_trade(trade_id):
+@app.route("/delete-trade/<int:trade_id>", methods=["POST"])
+def delete_trade(trade_id):
     trade = Trade.query.get_or_404(trade_id)
     db.session.delete(trade)
     db.session.commit()
     return redirect(url_for("journal"))
-
+    
 if __name__ == "__main__":
     main() 
