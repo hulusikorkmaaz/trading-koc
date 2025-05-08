@@ -17,6 +17,14 @@ def journal():
 @app.route("/statistics")
 def statistics():
     return render_template("statistics.html")
+
+@app.route("/pre-trade-checklist")
+def pre_trade_checklist():
+    return render_template("pre_trade_checklist.html")
+
+@app.route("/risk-calculator")
+def risk_calculator():
+    return render_template("risk_calculator.html")
 import tkinter as tk
 from tkinter import ttk, messagebox
 import json
