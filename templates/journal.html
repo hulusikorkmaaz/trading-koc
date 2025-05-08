@@ -1,305 +1,58 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Journal - Hiko'nun Trade Planı</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #1a1a1a;    /* Koyu gri */
-            --secondary-color: #2d2d2d;  /* Orta gri */
-            --accent-color: #ffffff;    /* Beyaz */
-            --success-color: #ffffff;   /* Beyaz */
-            --warning-color: #ffd700;   /* Altın sarısı */
-            --danger-color: #ff4444;    /* Kırmızı */
-            --text-color: #ffffff;      /* Beyaz */
-            --card-bg: #2d2d2d;        /* Orta gri */
-            --hover-color: #363636;    /* Açık gri */
-        }
-
-        body {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .navbar {
-            background-color: var(--secondary-color) !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
-            color: var(--text-color) !important;
-        }
-
-        .filter-section {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .section-title {
-            color: var(--accent-color);
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-label {
-            color: var(--text-color);
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-control, .form-select {
-            background-color: var(--hover-color);
-            border: 1px solid var(--secondary-color);
-            color: var(--text-color);
-            border-radius: 8px;
-            padding: 0.8rem;
-        }
-
-        .form-control:focus, .form-select:focus {
-            background-color: var(--hover-color);
-            border-color: var(--accent-color);
-            color: var(--text-color);
-            box-shadow: 0 0 0 0.25rem rgba(0, 255, 157, 0.25);
-        }
-
-        .btn-primary {
-            background-color: var(--accent-color);
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .btn-primary:hover {
-            background-color: #00cc7d;
-            transform: translateY(-2px);
-            color: var(--primary-color);
-        }
-
-        .trade-card {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .trade-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-        }
-
-        .trade-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .trade-pair {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--accent-color);
-        }
-
-        .trade-result {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .result-win {
-            background-color: rgba(0, 255, 157, 0.2);
-            color: var(--success-color);
-        }
-
-        .result-loss {
-            background-color: rgba(255, 68, 68, 0.2);
-            color: var(--danger-color);
-        }
-
-        .trade-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .detail-item {
-            background-color: var(--hover-color);
-            padding: 0.8rem;
-            border-radius: 8px;
-        }
-
-        .detail-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 0.3rem;
-        }
-
-        .detail-value {
-            font-weight: 500;
-            color: var(--text-color);
-        }
-
-        .trade-notes {
-            background-color: var(--hover-color);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-        }
-
-        .notes-title {
-            color: var(--accent-color);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .notes-content {
-            color: var(--text-color);
-            opacity: 0.8;
-        }
-
-        .section-icon {
-            color: var(--accent-color);
-            font-size: 1.2rem;
-        }
-
-        .no-trades {
-            text-align: center;
-            padding: 3rem;
-            color: var(--text-color);
-            opacity: 0.6;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-chart-line me-2"></i>
-                Hiko'nun Trade Planı
-            </a>
-        </div>
-    </nav>
-
-    <div class="container mt-5">
-        <div class="filter-section">
-            <h3 class="section-title">
-                <i class="fas fa-filter section-icon"></i>
-                Filtreler
-            </h3>
-            <form method="GET" class="row g-3">
-                <div class="col-md-3">
-                    <label for="result" class="form-label">Sonuç</label>
-                    <select class="form-select" id="result" name="result">
-                        <option value="">Tümü</option>
-                        <option value="win">Kazanç</option>
-                        <option value="loss">Kayıp</option>
-                    </select>
+<!-- ... önceki kodlar ... -->
+<div class="trades-section">
+    {% if trades %}
+        {% for trade in trades %}
+        <div class="trade-card">
+            <div class="trade-header">
+                <div class="trade-pair">{{ trade.pair }}</div>
+                <div class="trade-result {% if trade.result == 'win' %}result-win{% else %}result-loss{% endif %}">
+                    {{ trade.result|title }}
                 </div>
-                <div class="col-md-3">
-                    <label for="pair" class="form-label">Trading Pair</label>
-                    <select class="form-select" id="pair" name="pair">
-                        <option value="">Tümü</option>
-                        <option value="EUR/USD">EUR/USD</option>
-                        <option value="GBP/USD">GBP/USD</option>
-                        <option value="XAU/USD">XAU/USD</option>
-                        <option value="NZD/JPY">NZD/JPY</option>
-                        <option value="AUD/USD">AUD/USD</option>
-                        <option value="AUD/JPY">AUD/JPY</option>
-                        <option value="GBP/JPY">GBP/JPY</option>
-                        <option value="EUR/JPY">EUR/JPY</option>
-                    </select>
+            </div>
+            <div class="trade-details">
+                <div class="detail-item">
+                    <div class="detail-label">Tarih</div>
+                    <div class="detail-value">{{ trade.date.strftime('%d.%m.%Y') }}</div>
                 </div>
-                <div class="col-md-3">
-                    <label for="start_date" class="form-label">Başlangıç Tarihi</label>
-                    <input type="date" class="form-control" id="start_date" name="start_date">
+                <div class="detail-item">
+                    <div class="detail-label">Yön</div>
+                    <div class="detail-value">{{ trade.direction|title }}</div>
                 </div>
-                <div class="col-md-3">
-                    <label for="end_date" class="form-label">Bitiş Tarihi</label>
-                    <input type="date" class="form-control" id="end_date" name="end_date">
+                <div class="detail-item">
+                    <div class="detail-label">Risk Miktarı</div>
+                    <div class="detail-value">${{ "%.2f"|format(trade.risk_amount) }}</div>
                 </div>
-                <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search me-2"></i>
-                        Filtrele
-                    </button>
+                <div class="detail-item">
+                    <div class="detail-label">Kazanç/Kayıp</div>
+                    <div class="detail-value">${{ "%.2f"|format(trade.reward_amount) }}</div>
                 </div>
+                <div class="detail-item">
+                    <div class="detail-label">Risk/Ödül Oranı</div>
+                    <div class="detail-value">{{ "%.2f"|format(trade.risk_reward_ratio) }}</div>
+                </div>
+            </div>
+            <div class="trade-notes">
+                <div class="notes-title">Duygusal Analiz</div>
+                <div class="notes-content">{{ trade.emotions }}</div>
+                <div class="notes-title mt-3">Öğrenilen Dersler</div>
+                <div class="notes-content">{{ trade.lessons }}</div>
+                <div class="notes-title mt-3">Geliştirme Alanları</div>
+                <div class="notes-content">{{ trade.improvements }}</div>
+            </div>
+            <!-- Silme butonu -->
+            <form action="{{ url_for('delete_trade', trade_id=trade.id) }}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm mt-3" onclick="return confirm('Bu işlemi silmek istediğinize emin misiniz?');">
+                    <i class="fas fa-trash-alt"></i> Sil
+                </button>
             </form>
         </div>
-
-        <div class="trades-section">
-            {% if trades %}
-                {% for trade in trades %}
-                <div class="trade-card">
-                    <div class="trade-header">
-                        <div class="trade-pair">{{ trade.pair }}</div>
-                        <div class="trade-result {% if trade.result == 'win' %}result-win{% else %}result-loss{% endif %}">
-                            {{ trade.result|title }}
-                        </div>
-                    </div>
-                    <div class="trade-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Tarih</div>
-                            <div class="detail-value">{{ trade.date.strftime('%d.%m.%Y') }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Yön</div>
-                            <div class="detail-value">{{ trade.direction|title }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Risk Miktarı</div>
-                            <div class="detail-value">${{ "%.2f"|format(trade.risk_amount) }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Kazanç/Kayıp</div>
-                            <div class="detail-value">${{ "%.2f"|format(trade.reward_amount) }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Risk/Ödül Oranı</div>
-                            <div class="detail-value">{{ "%.2f"|format(trade.risk_reward_ratio) }}</div>
-                        </div>
-                    </div>
-                    <div class="trade-notes">
-                        <div class="notes-title">Duygusal Analiz</div>
-                        <div class="notes-content">{{ trade.emotions }}</div>
-                        <div class="notes-title mt-3">Öğrenilen Dersler</div>
-                        <div class="notes-content">{{ trade.lessons }}</div>
-                        <div class="notes-title mt-3">Geliştirme Alanları</div>
-                        <div class="notes-content">{{ trade.improvements }}</div>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="no-trades">
-                    <i class="fas fa-book fa-3x mb-3"></i>
-                    <h4>Henüz kayıtlı işlem bulunmuyor</h4>
-                    <p>İşlem sonrası değerlendirme yaparak journal'a kayıt ekleyebilirsiniz.</p>
-                </div>
-            {% endif %}
+        {% endfor %}
+    {% else %}
+        <div class="no-trades">
+            <i class="fas fa-book fa-3x mb-3"></i>
+            <h4>Henüz kayıtlı işlem bulunmuyor</h4>
+            <p>İşlem sonrası değerlendirme yaparak journal'a kayıt ekleyebilirsiniz.</p>
         </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html> 
-
-<form action="{{ url_for('delete_trade', trade_id=trade.id) }}" method="post" style="display:inline;">
-    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bu işlemi silmek istediğinize emin misiniz?');">Sil</button>
-</form>
+    {% endif %}
+</div>
+<!-- ... sonrası kodlar ... -->
