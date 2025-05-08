@@ -1,5 +1,8 @@
 from flask import Flask
 app = Flask(__name__)
+@app.route("/")
+def index():
+    return "Uygulaman çalışıyor! Ana sayfa burası."
 import tkinter as tk
 from tkinter import ttk, messagebox
 import json
