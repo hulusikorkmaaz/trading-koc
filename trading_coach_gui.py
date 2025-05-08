@@ -1,86 +1,105 @@
+from flask import Flask, request, jsonify, render_template
+from models import db, PreTradeChecklist, PostTradeAnalysis
 import os
-from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
 
-# Mutlak veritabanı yolu
-basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
+
+# Veritabanı konfigürasyonu
+basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'trades.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 
-# Trade modeli
-class Trade(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    pair = db.Column(db.String(50))
-    direction = db.Column(db.String(10))
-    result = db.Column(db.String(10))
-    risk_amount = db.Column(db.Float)
-    reward_amount = db.Column(db.Float)
-    risk_reward_ratio = db.Column(db.Float)
-    emotions = db.Column(db.String(200))
-    lessons = db.Column(db.String(200))
-    improvements = db.Column(db.String(200))
-    date = db.Column(db.String(50))
+# Veritabanını başlat
+db.init_app(app)
 
-@app.route("/")
+# Veritabanını oluştur
+with app.app_context():
+    db.create_all()
+
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route("/post-trade-analysis", methods=["GET", "POST"])
-def post_trade_analysis():
-    if request.method == "POST":
-        trade = Trade(
-            pair=request.form.get("pair"),
-            direction=request.form.get("direction"),
-            result=request.form.get("result"),
-            risk_amount=request.form.get("risk_amount", type=float),
-            reward_amount=request.form.get("reward_amount", type=float),
-            risk_reward_ratio=request.form.get("risk_reward_ratio", type=float),
-            emotions=request.form.get("emotions"),
-            lessons=request.form.get("lessons"),
-            improvements=request.form.get("improvements"),
-            date=request.form.get("date")
-        )
-        db.session.add(trade)
-        db.session.commit()
-        return redirect(url_for("journal"))
-    return render_template("post_trade_analysis.html")
+@app.route('/pre-trade-checklist')
+def pre_trade_checklist_page():
+    return render_template('pre_trade_checklist.html')
 
-@app.route("/journal")
+@app.route('/post-trade-analysis')
+def post_trade_analysis_page():
+    return render_template('post_trade_analysis.html')
+
+@app.route('/journal')
 def journal():
-    trades = Trade.query.all()
-    return render_template("journal.html", trades=trades)
+    analyses = PostTradeAnalysis.query.order_by(PostTradeAnalysis.created_at.desc()).all()
+    return render_template('journal.html', analyses=analyses)
 
-@app.route("/statistics")
-def statistics():
-    return render_template("statistics.html")
-
-@app.route("/pre-trade-checklist", methods=["GET", "POST"])
+@app.route('/pre-trade-checklist', methods=['POST'])
 def pre_trade_checklist():
-    if request.method == "POST":
-        # Burada formdan gelen verileri işleyebilirsin
-        return redirect(url_for("journal"))
-    return render_template("pre_trade_checklist.html")
+    try:
+        data = request.get_json()
+        
+        checklist = PreTradeChecklist(
+            market_conditions=bool(data.get('market_conditions')),
+            market_trend=bool(data.get('market_trend')),
+            support_resistance=bool(data.get('support_resistance')),
+            price_zone=bool(data.get('price_zone')),
+            mitigation=bool(data.get('mitigation')),
+            fvg=bool(data.get('fvg')),
+            opposing_force=bool(data.get('opposing_force')),
+            emotional_state=bool(data.get('emotional_state')),
+            risk_tolerance=bool(data.get('risk_tolerance')),
+            trading_plan=bool(data.get('trading_plan')),
+            news_check=bool(data.get('news_check'))
+        )
+        
+        db.session.add(checklist)
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error in pre-trade-checklist: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route("/risk-calculator")
-def risk_calculator():
-    return render_template("risk_calculator.html")
+@app.route('/post-trade-analysis', methods=['POST'])
+def post_trade_analysis():
+    try:
+        data = request.get_json()
+        
+        analysis = PostTradeAnalysis(
+            pair=data.get('pair'),
+            direction=data.get('direction'),
+            entry_price=float(data.get('entry_price', 0)),
+            stop_loss=float(data.get('stop_loss', 0)),
+            take_profit=float(data.get('take_profit', 0)),
+            result=data.get('result'),
+            exit_price=float(data.get('exit_price', 0)),
+            risk_amount=float(data.get('risk_amount', 0)),
+            reward_amount=float(data.get('reward_amount', 0)),
+            risk_reward_ratio=float(data.get('risk_reward_ratio', 0)),
+            emotions=data.get('emotions'),
+            emotional_impact=data.get('emotional_impact'),
+            lessons=data.get('lessons'),
+            improvements=data.get('improvements')
+        )
+        
+        db.session.add(analysis)
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error in post-trade-analysis: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route("/delete-trade/<int:trade_id>", methods=["POST"])
-def delete_trade(trade_id):
-    trade = Trade.query.get_or_404(trade_id)
-    db.session.delete(trade)
-    db.session.commit()
-    return redirect(url_for("journal"))
+@app.route('/delete-analysis/<int:id>', methods=['POST'])
+def delete_analysis(id):
+    try:
+        analysis = PostTradeAnalysis.query.get_or_404(id)
+        db.session.delete(analysis)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error in delete-analysis: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-# Render ve diğer production ortamları için: 
-# Sadece tabloyu oluştur, sunucuyu başlatma!
-db_path = os.path.join(basedir, 'trades.db')
-if not os.path.exists(db_path):
-    with app.app_context():
-        db.create_all()
-
-# Sadece localde çalıştırmak için:
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
