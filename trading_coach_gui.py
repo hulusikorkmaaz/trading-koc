@@ -11,9 +11,12 @@ class Trade(db.Model):
     pair = db.Column(db.String(50))
     direction = db.Column(db.String(10))
     result = db.Column(db.String(10))
-    risk_reward = db.Column(db.String(10))
+    risk_amount = db.Column(db.Float)
+    reward_amount = db.Column(db.Float)
+    risk_reward_ratio = db.Column(db.Float)
     emotions = db.Column(db.String(200))
     lessons = db.Column(db.String(200))
+    improvements = db.Column(db.String(200))
     date = db.Column(db.String(50))
 
 @app.route("/")
