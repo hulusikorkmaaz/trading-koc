@@ -497,6 +497,7 @@ Hesaplanan Risk Miktarı: ${risk_amount:.2f}
     root.mainloop()
 
 @app.route("/delete-trade/<int:trade_id>", methods=["POST"])
+
 def delete_trade(trade_id):
     trade = Trade.query.get_or_404(trade_id)
     db.session.delete(trade)
